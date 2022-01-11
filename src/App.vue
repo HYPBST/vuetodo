@@ -16,14 +16,14 @@
           <td>{{painting.title}}</td>
           <td>{{painting.on_display}}</td>
           <td>{{painting.year}}</td>
-          <td><button @click="deletePainting(painting.id)">Delete</button></td>
+          <td><button @click="deletePainting(painting.id)">Delete</button><button @click="editPainting(painting.id)">Edit</button></td>
         </tr>
         <tr>
           <td><input type="hidden" v-model="painting.id"></td>
           <td><input type="text" v-model="painting.title"></td>
           <td><input type="checkbox" v-model="painting.on_display"></td>
           <td><input type="number" v-model="painting.year"></td>
-          <td><button @click="letrehoz">Létrehoz</button></td>
+          <td><button @click="letrehoz" :disabled="saving">Létrehoz</button></td>
         </tr>
       </tbody>
     </table>
@@ -41,6 +41,7 @@ export default {
   },
   data() {
     return {
+      saving:false,
       painting:{
         id:null,
         title:'',
@@ -63,7 +64,13 @@ export default {
      console.log(Response)
      await this.loadData()
    },
+   async editPainting(id){
+     let Response=await fetch(`http://127.0.0.1:8000/api/paintings/${id}`)
+     let data=await Response.json()
+     this.painting={...data};
+   },
    async letrehoz(){
+     this.saving=true
      await fetch('http://127.0.0.1:8000/api/paintings',{
        method:'POST',
        headers: {
@@ -73,6 +80,7 @@ export default {
        body: JSON.stringify(this.painting)
      })
      await this.loadData()
+     this.saving=false
    }
   }
 }
